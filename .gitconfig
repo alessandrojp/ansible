@@ -1,0 +1,10 @@
+[user]
+	name = Alessandro Yuichi Okimoto
+	email = yuichijpn@gmail.com
+[alias]
+	ci = commit
+	st = status
+	br = branch
+	co = checkout
+[ghq]
+	root = ~/Documents/workspace/src

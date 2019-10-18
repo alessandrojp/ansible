@@ -1,0 +1,93 @@
+- hosts: localhost
+  connection: local
+
+  vars:
+    homebrew_taps:
+      - homebrew/cask
+      - homebrew/cask-versions
+
+    homebrew_cask_packages:
+      - name: minikube
+      - name: java8
+      - name: java
+      - name: docker
+      - name: google-cloud-sdk
+      - name: alfred
+      - name: google-chrome
+      - name: firefox-developer-edition
+      - name: slack
+      - name: evernote
+      - name: android-sdk
+      - name: android-platform-tools
+      - name: android-ndk
+      - name: android-studio
+      - name: sublime-text 
+
+    homebrew_packages:
+      - name: ansible
+      - name: python
+      - name: python3
+      - name: git
+      - name: kubectl
+      - name: jsonnet
+      - name: emacs
+      - name: terraform
+      - name: antigen
+      - name: zsh
+      - name: bazel
+      - name: redis
+      - name: protobuf
+      - name: kubernetes-helm
+      - name: go
+      - name: ghq 
+
+    go_get:
+      - name: godef
+        url: github.com/rogpeppe/godef
+      - name: gocode
+        url: github.com/nsf/gocode
+      - name: golint
+        url: golang.org/x/lint/golint
+      - name: errcheck
+        url: github.com/kisielk/errcheck
+      - name: grpc
+        url: google.golang.org/grpc
+      - name: protoc-gen-go
+        url: github.com/golang/protobuf/protoc-gen-go
+      - name: goimports
+        url: golang.org/x/tools/cmd/goimports
+      - name: googleapis
+        url: github.com/googleapis/googleapis
+
+  tasks:
+    - name: homebrew update
+      homebrew:
+        update_homebrew: yes
+
+    - name: homebrew tap
+      homebrew_tap:
+        name: '{{ item }}'
+        state: present
+      with_items: '{{ homebrew_taps }}'
+
+    - name: homebrew cask packages install
+      homebrew_cask: name={{ item.name }} state=installed
+      environment:
+        HOMEBREW_CASK_OPTS: "--appdir=/Applications"
+      with_items: '{{ homebrew_cask_packages }}'
+      changed_when: false
+      ignore_errors: true
+
+    - name: homebrew packages install
+      homebrew:
+        name: '{{ item.name }}'
+        state: '{{ item.state | default("present") }}'
+      with_items: '{{ homebrew_packages }}'
+      changed_when: false
+      ignore_errors: true
+
+    - name: golang packages install
+      shell: "go get -u {{ item.url }}"
+      with_items: "{{ go_get }}"
+      changed_when: false
+      ignore_errors: true
